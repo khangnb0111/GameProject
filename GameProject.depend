@@ -1,20 +1,27 @@
 # depslib dependency file v1.0
-1740926460 source:e:\c++\gameproject\main.cpp
+1741618553 source:e:\c++\gameproject\main.cpp
 	<iostream>
 	"defs.h"
 	"GRAPHIC.h"
 	"Char.h"
+	"Map.h"
 
-1740995126 e:\c++\gameproject\defs.h
+1741619167 e:\c++\gameproject\defs.h
 
-1740995833 e:\c++\gameproject\graphic.h
+1741619074 e:\c++\gameproject\graphic.h
 	<SDL.h>
 	<SDL_image.h>
 	"defs.h"
 	"Char.h"
+	"Map.h"
 
-1740993647 e:\c++\gameproject\char.h
+1741619070 e:\c++\gameproject\char.h
 	<SDL_image.h>
+	<SDL.h>
+	"defs.h"
+	"Map.h"
+
+1741619167 e:\c++\gameproject\map.h
 	<SDL.h>
 	"defs.h"
 

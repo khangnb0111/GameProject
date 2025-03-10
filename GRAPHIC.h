@@ -6,6 +6,7 @@
 
 #include "defs.h"
 #include "Char.h"
+#include "Map.h"
 
 struct Game
 {
@@ -71,23 +72,44 @@ struct Game
         SDL_RenderCopyEx(renderer, texture, NULL, &dest, NULL, NULL, flip);
     }
 
-    void renderWall(SDL_Texture *texture, int x, int y)
+    void renderTexture(SDL_Texture *texture, int x, int y)
     {
-        SDL_Rect
+        SDL_Rect dest;
+        dest.x = x;
+        dest.y = y;
+        SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+
+        SDL_RenderCopy(renderer, texture, NULL, &dest);
+    }
+
+    void renderStage(SDL_Texture *texture, MAP &Stage, int n, int m)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (Stage.Map[i][j] == 1)
+                {
+                    Stage.dest.x = j * ESize;
+                    Stage.dest.y = i * ESize;
+                    SDL_RenderCopy(renderer, texture, NULL, &Stage.dest);
+                }
+            }
+        }
     }
 
     void initImage()
     {
         pos = loadTexture("Image/ninja.png");
         dirt = loadTexture("Image/dirt.jpg");
-        //shuriken = loadTexture("Image/ninja.png");
     }
 
-    void render(Player &player)
+    void render(Player &player, MAP &Stage)
     {
         SDL_RenderClear(renderer);
 
         renderChar(pos, player.dest, player.flip);
+        renderStage(dirt, Stage, 10, 15);
     }
 
     void init()
@@ -109,6 +131,9 @@ struct Game
 
         SDL_DestroyTexture(pos);
         pos = nullptr;
+
+        SDL_DestroyTexture(dirt);
+        dirt = nullptr;
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);

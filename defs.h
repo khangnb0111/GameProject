@@ -6,8 +6,14 @@
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 640;
 
-const int speed = 3;
-const int gravity = 3;
-const int Hjump = 30;
+const int ESize = 64;
+
+const int MAP_HEIGHT = 10;
+const int MAP_WEIGHT = 15;
+
+
+const float speed = 5;
+const float gravity = 1.5;
+const int MaxJump = 20;
 
 #endif // DEFS_H_INCLUDED

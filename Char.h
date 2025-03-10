@@ -5,6 +5,7 @@
 #include <SDL.h>
 
 #include "defs.h"
+#include "Map.h"
 
 struct Player
 {
@@ -12,18 +13,15 @@ struct Player
 
     SDL_RendererFlip flip;
 
-    int dx= 0;
-    int dy = 0;
+    float dx= 0;
+    float dy = 0;
 
-    int HighJump = Hjump;
-
-    bool jump = false;
-    bool fall = false;
+    bool isOnGround = false;
 
     Player()
     {
-        dest.h = 64;
-        dest.w = 64;
+        dest.h = ESize;
+        dest.w = ESize;
         dest.x = SCREEN_WIDTH / 2;
         dest.y = SCREEN_HEIGHT / 2;
     }
@@ -42,44 +40,101 @@ struct Player
 
     void Jump()
     {
-        if (!fall)
+        dy = -MaxJump;
+    }
+
+    bool InStage()
+    {
+        if (dest.y <= 0) return false;
+        if (dest.x <= 0) return false;
+        if (dest.y + ESize > SCREEN_HEIGHT) return false;
+        if (dest.x + ESize > SCREEN_WIDTH) return false;
+        return true;
+    }
+
+    void Interact(MAP &Stage)
+    {
+        int mx, my, adj;
+        bool hit;
+
+        if (dx != 0)
         {
-            dy = -gravity;
-            jump = true;
+            dest.x += dx;
+
+            mx = (dx > 0 ? (dest.x + dest.w) : dest.x);
+            mx /= ESize;
+
+            my = dest.y / ESize;
+
+            hit = false;
+
+            if (!InStage() || Stage.Map[my][mx] != 0)
+            {
+                hit = true;
+            }
+
+            my = (dest.y + dest.h - 1) / ESize;
+
+            if (!InStage() || Stage.Map[my][mx] != 0)
+            {
+                hit= true;
+            }
+
+            if (hit)
+            {
+                adj = (dx > 0 ? -dest.w : dest.w);
+
+                dest.x = (mx * ESize) + adj;
+
+                dx = 0;
+            }
+        }
+
+        if (dy != 0)
+        {
+            dest.y += dy;
+
+            my = (dy > 0 ? (dest.y + dest.h) : dest.y);
+            my /= ESize;
+
+            mx = dest.x / ESize;
+
+            hit = false;
+
+            if (!InStage() || Stage.Map[my][mx] != 0)
+            {
+                hit = true;
+            }
+
+            mx = (dest.x + dest.w - 1) / ESize;
+
+            if (!InStage() || Stage.Map[my][mx] != 0)
+            {
+                hit= true;
+            }
+
+            if (hit)
+            {
+                adj = (dy > 0 ? -dest.h : dest.h);
+
+                dest.y = (my * ESize) + adj;
+
+                isOnGround = (dy > 0);
+
+                dy = 0;
+            }
         }
     }
 
-    void Fall()
+    void Move(MAP &Stage)
     {
-        if (!jump && fall)
-        {
-            dy = gravity;
-        }
-    }
+        dy += gravity;
 
-    void Move()
-    {
-        dest.x += dx;
-        dest.y += dy;
+        isOnGround = false;
+
+        Interact(Stage);
+
         dx = 0;
-        if (jump)
-        {
-            HighJump--;
-            if (HighJump == 0)
-            {
-                jump = false;
-                fall = true;
-            }
-        }
-        else if (fall)
-        {
-            HighJump++;
-            if (HighJump == Hjump)
-            {
-                fall = false;
-            }
-        }
-        if (!jump && !fall) dy = 0;
     }
 };
 
