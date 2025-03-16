@@ -10,9 +10,9 @@ const int ESize = 64;
 
 const int MAP_HEIGHT = 10;
 const int MAP_WIDTH = 15;
-const int scroll = 1;
+const int scroll = 2;
 
-const float speed = 5;
+const float speed = 6;
 const float gravity = 1.5;
 const int MaxJump = 20;
 
