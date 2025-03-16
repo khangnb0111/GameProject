@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SDL_mixer.h>
 
 #include "defs.h"
 #include "GRAPHIC.h"
@@ -18,11 +19,19 @@ int main(int argc, char* argv[])
     Game game;
     game.init(background, player, Stage);
 
+    Mix_Music *gMusic = game.loadMusic("Music\\JoJo.mp3");
+    game.playMusic(gMusic);
+    Mix_Chunk *gJump = game.loadSound("Music\\Jump.wav");
+
     background.setTexture();
 
     while (game.running(player))
     {
-        if (game.currentKeyStates[SDL_SCANCODE_UP] && player.isOnGround) player.Jump();
+        if (game.currentKeyStates[SDL_SCANCODE_UP] && player.isOnGround)
+        {
+            player.Jump();
+            game.play(gJump);
+        }
         if (game.currentKeyStates[SDL_SCANCODE_LEFT]) player.TurnLeft();
         if (game.currentKeyStates[SDL_SCANCODE_RIGHT]) player.TurnRight();
 
@@ -34,6 +43,9 @@ int main(int argc, char* argv[])
 
         SDL_Delay(20);
     }
+
+    if (gMusic != nullptr) Mix_FreeMusic( gMusic );
+    if (gJump != nullptr) Mix_FreeChunk( gJump);
 
     game.quit(background, player, Stage);
 
