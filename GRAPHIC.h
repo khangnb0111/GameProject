@@ -14,8 +14,6 @@ struct Game
     SDL_Renderer* renderer;
     SDL_Event event;
 
-    SDL_Texture *pos, *dirt;
-
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
     void logErrorAndExit(const char* msg, const char* error)
@@ -44,10 +42,17 @@ struct Game
         SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
-    void prepare()
+    void initImage(Background &background, Player &player, MAP &Stage)
     {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
+        player.texture = loadTexture("Image/ninja.png");
+        Stage.texture = loadTexture("Image/dirt.jpg");
+        background.texture = loadTexture("Image/forest.jpg");
+    }
+
+    void init(Background &background, Player &player, MAP &Stage)
+    {
+        initSDL();
+        initImage(background, player, Stage);
     }
 
     void present()
@@ -67,73 +72,85 @@ struct Game
         return texture;
     }
 
-    void renderChar(SDL_Texture *texture, SDL_Rect &dest, SDL_RendererFlip flip)
-    {
-        SDL_RenderCopyEx(renderer, texture, NULL, &dest, NULL, NULL, flip);
-    }
-
     void renderTexture(SDL_Texture *texture, int x, int y)
     {
         SDL_Rect dest;
+
         dest.x = x;
         dest.y = y;
-        SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+        dest.w = SCREEN_WIDTH;
+        dest.h = SCREEN_HEIGHT;
 
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void renderStage(SDL_Texture *texture, MAP &Stage, int n, int m)
+    void renderBackground(Background &background)
     {
-        for (int i = 0; i < n; i++)
+        renderTexture(background.texture, background.scrollingOffset, 0);
+        renderTexture(background.texture, background.scrollingOffset - background.dest.w, 0);
+        background.scroll(scroll);
+    }
+
+    void renderChar(Player &player)
+    {
+        SDL_RenderCopyEx(renderer, player.texture, NULL, &player.dest, NULL, NULL, player.flip);
+        player.dest.x -= scroll;
+    }
+
+    void renderStage(MAP &Stage)
+    {
+        for (int i = 0; i < MAP_HEIGHT; i++)
         {
-            for (int j = 0; j < m; j++)
+            for (int j = 0; j < MAP_WIDTH + 1; j++)
             {
                 if (Stage.Map[i][j] == 1)
                 {
-                    Stage.dest.x = j * ESize;
+                    Stage.dest.x = j * ESize - (Stage.scrollingOffset % ESize);
                     Stage.dest.y = i * ESize;
-                    SDL_RenderCopy(renderer, texture, NULL, &Stage.dest);
+                    SDL_RenderCopy(renderer, Stage.texture, NULL, &Stage.dest);
                 }
             }
         }
+
+        Stage.scrollingOffset += scroll;
+
+        if (Stage.scrollingOffset % ESize == 0) Stage.MapMove();
+        if (Stage.scrollingOffset >= SCREEN_WIDTH + ESize)
+        {
+            Stage.loadMap("data/Level-1.txt", "data/Level-1.txt");
+            Stage.scrollingOffset = 0;
+        }
     }
 
-    void initImage()
-    {
-        pos = loadTexture("Image/ninja.png");
-        dirt = loadTexture("Image/dirt.jpg");
-    }
-
-    void render(Player &player, MAP &Stage)
+    void render(Player &player, MAP &Stage, Background &background)
     {
         SDL_RenderClear(renderer);
 
-        renderChar(pos, player.dest, player.flip);
-        renderStage(dirt, Stage, 10, 15);
+        renderBackground(background);
+        renderChar(player);
+        renderStage(Stage);
     }
 
-    void init()
+    bool running(Player &player)
     {
-        initSDL();
-        initImage();
-    }
-
-    bool running()
-    {
+        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize) return false;
         SDL_PollEvent(&event);
         if (event.type == SDL_QUIT) return false;
         return true;
     }
 
-    void quit()
+    void quit(Background &background, Player &player, MAP &Stage)
     {
         IMG_Quit();
 
-        SDL_DestroyTexture(pos);
-        pos = nullptr;
+        SDL_DestroyTexture(player.texture);
+        player.texture = nullptr;
 
-        SDL_DestroyTexture(dirt);
-        dirt = nullptr;
+        SDL_DestroyTexture(Stage.texture);
+        Stage.texture = nullptr;
+
+        SDL_DestroyTexture(background.texture);
+        background.texture = nullptr;
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);

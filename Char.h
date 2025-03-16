@@ -9,6 +9,8 @@
 
 struct Player
 {
+    SDL_Texture *texture;
+
     SDL_Rect src, dest;
 
     SDL_RendererFlip flip;
@@ -61,7 +63,7 @@ struct Player
         {
             dest.x += dx;
 
-            mx = (dx > 0 ? (dest.x + dest.w) : dest.x);
+            mx = (dx > 0 ? (dest.x + dest.w + (Stage.scrollingOffset % ESize)) : dest.x + (Stage.scrollingOffset % ESize));
             mx /= ESize;
 
             my = dest.y / ESize;
@@ -82,7 +84,7 @@ struct Player
 
             if (hit)
             {
-                adj = (dx > 0 ? -dest.w : dest.w);
+                adj = (dx > 0 ? -dest.w - (Stage.scrollingOffset % ESize) : dest.w - (Stage.scrollingOffset % ESize));
 
                 dest.x = (mx * ESize) + adj;
 
@@ -97,7 +99,7 @@ struct Player
             my = (dy > 0 ? (dest.y + dest.h) : dest.y);
             my /= ESize;
 
-            mx = dest.x / ESize;
+            mx = (dest.x + (Stage.scrollingOffset % ESize)) / ESize;
 
             hit = false;
 
@@ -106,7 +108,7 @@ struct Player
                 hit = true;
             }
 
-            mx = (dest.x + dest.w - 1) / ESize;
+            mx = (dest.x + dest.w + (Stage.scrollingOffset % ESize) - 1) / ESize;
 
             if (!InStage() || Stage.Map[my][mx] != 0)
             {

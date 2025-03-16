@@ -9,31 +9,33 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    Game game;
-    game.init();
-
     Player player;
 
     MAP Stage;
 
-    while (game.running())
-    {
-        game.prepare();
+    Background background;
 
+    Game game;
+    game.init(background, player, Stage);
+
+    background.setTexture();
+
+    while (game.running(player))
+    {
         if (game.currentKeyStates[SDL_SCANCODE_UP] && player.isOnGround) player.Jump();
         if (game.currentKeyStates[SDL_SCANCODE_LEFT]) player.TurnLeft();
         if (game.currentKeyStates[SDL_SCANCODE_RIGHT]) player.TurnRight();
 
         player.Move(Stage);
 
-        game.render(player, Stage);
+        game.render(player, Stage, background);
 
         game.present();
 
-        SDL_Delay(10);
+        SDL_Delay(20);
     }
 
-    game.quit();
+    game.quit(background, player, Stage);
 
     return 0;
 }
