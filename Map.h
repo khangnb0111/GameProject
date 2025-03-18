@@ -18,43 +18,51 @@ struct MAP
     int Map[MAP_HEIGHT][(MAP_WIDTH + 1) * 2] = {0};
     int MapPre[MAP_HEIGHT][MAP_WIDTH] = {0};
     int scrollingOffset = 0;
+    int tmp;
+
+    std::string files[10];
 
     MAP()
     {
+        for (int i = 0; i < 10; i++)
+        {
+            files[i] = "data/Level-";
+            files[i] += char(i + '0');
+            files[i] += ".txt";
+        }
+
         dest.w = ESize;
         dest.h = ESize;
 
-        loadMap("data/Level-1.txt", "data/Level-1.txt");
-    }
-
-    void loadMap(const std::string &fileName1, const std::string &fileName2)
-    {
-        std::ifstream file1(fileName1);
-        if (!file1)
-        {
-            std::cout << "Error opening file: " << fileName1 << std::endl;
-            return;
-        }
-
         for (int i = 0; i < MAP_HEIGHT; i++)
         {
-            for (int j = 0; j < MAP_WIDTH + 1; j++)
+            for (int j = 0; j <= MAP_WIDTH; j++)
             {
-                if (!(file1 >> Map[i][j]))
+                if (i == 0 || i == MAP_HEIGHT - 1)
                 {
-                    std::cout << "Error reading map data" << std::endl;
-                    return;
+                    Map[i][j] = 1;
+                }
+                else
+                {
+                    Map[i][j] = 0;
                 }
             }
         }
 
-        file1.close();
+        Map[MAP_HEIGHT - 1][MAP_WIDTH] = 0;
 
-        std::ifstream file2(fileName2);
+        tmp = rand() % 10;
 
-        if (!file2)
+        loadMap(files[tmp]);
+    }
+
+    void loadMap(const std::string &fileName)
+    {
+        std::ifstream file(fileName);
+
+        if (!file)
         {
-            std::cout << "Error opening file: " << fileName2 << std::endl;
+            std::cout << "Error opening file: " << fileName << std::endl;
             return;
         }
 
@@ -62,7 +70,7 @@ struct MAP
         {
             for (int j = MAP_WIDTH + 1; j < (MAP_WIDTH + 1) * 2; j++)
             {
-                if (!(file2 >> Map[i][j]))
+                if (!(file >> Map[i][j]))
                 {
                     std::cout << "Error reading map data" << std::endl;
                     return;
@@ -70,7 +78,7 @@ struct MAP
             }
         }
 
-        file2.close();
+        file.close();
     }
 
     void MapMove()

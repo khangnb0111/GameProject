@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     game.init(background, player, Stage);
 
     Mix_Music *gMusic = game.loadMusic("Music\\JoJo.mp3");
-    game.playMusic(gMusic);
+    //game.playMusic(gMusic);
     Mix_Chunk *gJump = game.loadSound("Music\\Jump.wav");
 
     background.setTexture();

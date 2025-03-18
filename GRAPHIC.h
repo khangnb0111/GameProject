@@ -163,8 +163,16 @@ struct Game
         if (Stage.scrollingOffset % ESize == 0) Stage.MapMove();
         if (Stage.scrollingOffset >= SCREEN_WIDTH + ESize)
         {
-            Stage.loadMap("data/Level-1.txt", "data/Level-1.txt");
+            int random = rand() % 10;
+            while (random == Stage.tmp)
+            {
+                random = rand() % 10;
+            }
+            Stage.tmp = random;
+            Stage.loadMap(Stage.files[random]);
             Stage.scrollingOffset = 0;
+
+            //std::cout << random << std::endl;
         }
     }
 
@@ -176,6 +184,12 @@ struct Game
         renderChar(player);
         renderStage(Stage);
     }
+
+    /*bool gameOver()
+    {
+        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize) return true;
+        return false;
+    }*/
 
     bool running(Player &player)
     {
