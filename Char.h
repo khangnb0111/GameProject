@@ -1,9 +1,6 @@
 #ifndef CHAR_H_INCLUDED
 #define CHAR_H_INCLUDED
 
-#include <SDL_image.h>
-#include <SDL.h>
-
 #include "defs.h"
 #include "Map.h"
 
@@ -24,6 +21,12 @@ struct Player
     {
         dest.h = ESize;
         dest.w = ESize;
+        dest.x = SCREEN_WIDTH / 2;
+        dest.y = SCREEN_HEIGHT / 2;
+    }
+
+    void reset()
+    {
         dest.x = SCREEN_WIDTH / 2;
         dest.y = SCREEN_HEIGHT / 2;
     }

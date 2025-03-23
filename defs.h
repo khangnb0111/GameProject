@@ -3,6 +3,17 @@
 
 #define WINDOW_TITLE  "Hello World!"
 
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <SDL_ttf.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <ctime>
+
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 768;
 

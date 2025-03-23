@@ -1,38 +1,55 @@
 #ifndef MAP_H_INCLUDED
 #define MAP_H_INCLUDED
 
-#include <fstream>
-#include <cstring>
-#include <SDL.h>
-#include <SDL_image.h>
-
 #include "defs.h"
+#include "Ltexture.h"
 #include "GRAPHIC.h"
 
 struct MAP
 {
-    SDL_Texture *texture;
-
-    SDL_Rect dest;
-
     int Map[MAP_HEIGHT][(MAP_WIDTH + 1) * 2] = {0};
-    int MapPre[MAP_HEIGHT][MAP_WIDTH] = {0};
     int scrollingOffset = 0;
     int tmp;
 
-    std::string files[10];
+    std::string files[10] = {
+    "data/Level-0.txt",
+    "data/Level-1.txt",
+    "data/Level-2.txt",
+    "data/Level-3.txt",
+    "data/Level-4.txt",
+    "data/Level-5.txt",
+    "data/Level-6.txt",
+    "data/Level-7.txt",
+    "data/Level-8.txt",
+    "data/Level-9.txt"};
 
     MAP()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < MAP_HEIGHT; i++)
         {
-            files[i] = "data/Level-";
-            files[i] += char(i + '0');
-            files[i] += ".txt";
+            for (int j = 0; j <= MAP_WIDTH; j++)
+            {
+                if (i == 0 || i == MAP_HEIGHT - 1)
+                {
+                    Map[i][j] = 1;
+                }
+                else
+                {
+                    Map[i][j] = 0;
+                }
+            }
         }
 
-        dest.w = ESize;
-        dest.h = ESize;
+        Map[MAP_HEIGHT - 1][MAP_WIDTH] = 0;
+
+        tmp = rand() % 10;
+
+        loadMap(files[tmp]);
+    }
+
+    void reset()
+    {
+        scrollingOffset = 0;
 
         for (int i = 0; i < MAP_HEIGHT; i++)
         {
@@ -95,21 +112,18 @@ struct MAP
 
 struct Background
 {
-    SDL_Texture *texture;
-
-    SDL_Rect dest;
-
     int scrollingOffset = 0;
 
-    void setTexture()
+    void setTexture(Ltexture &gBackground)
     {
-        SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+        gBackground.w = SCREEN_WIDTH;
+        gBackground.h = SCREEN_WIDTH;
     }
 
-    void scroll(int distance)
+    void scroll(int distance, Ltexture &gBackground)
     {
         scrollingOffset -= distance;
-        if( scrollingOffset < 0 ) { scrollingOffset = dest.w; }
+        if( scrollingOffset < 0 ) { scrollingOffset = gBackground.w; }
     }
 
 };

@@ -1,13 +1,15 @@
 #ifndef GRAPHIC_H_INCLUDED
 #define GRAPHIC_H_INCLUDED
 
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-
 #include "defs.h"
 #include "Char.h"
 #include "Map.h"
+#include "Ltexture.h"
+
+struct Menu
+{
+    SDL_Texture* startButton;
+};
 
 struct Game
 {
@@ -16,6 +18,10 @@ struct Game
     SDL_Event event;
 
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+    bool start = false;
+
+    int x, y;
 
     void logErrorAndExit(const char* msg, const char* error)
     {
@@ -60,11 +66,12 @@ struct Game
         return texture;
     }
 
-    void initImage(Background &background, Player &player, MAP &Stage)
+    void initImage(Ltexture &gBackground, Player &player, Ltexture &dirt, Menu &menu)
     {
         player.texture = loadTexture("Image/ninja.png");
-        Stage.texture = loadTexture("Image/dirt.jpg");
-        background.texture = loadTexture("Image/forest.jpg");
+        dirt.texture = loadTexture("Image/dirt.jpg");
+        gBackground.texture = loadTexture("Image/forest.jpg");
+        menu.startButton = loadTexture("Image/startbutton.png");
     }
 
     Mix_Music *loadMusic(const char* path)
@@ -107,10 +114,10 @@ struct Game
         }
     }
 
-    void init(Background &background, Player &player, MAP &Stage)
+    void init(Ltexture &gBackground, Player &player, Ltexture &dirt, Menu &menu)
     {
         initSDL();
-        initImage(background, player, Stage);
+        initImage(gBackground, player, dirt, menu);
     }
 
     void present()
@@ -118,23 +125,30 @@ struct Game
         SDL_RenderPresent(renderer);
     }
 
-    void renderTexture(SDL_Texture *texture, int x, int y)
+    void renderTexture(SDL_Texture *texture, int x, int y, int h = SCREEN_HEIGHT, int w = SCREEN_WIDTH)
     {
         SDL_Rect dest;
 
         dest.x = x;
         dest.y = y;
-        dest.w = SCREEN_WIDTH;
-        dest.h = SCREEN_HEIGHT;
+        dest.w = w;
+        dest.h = h;
 
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void renderBackground(Background &background)
+    void rendermenu(Menu &menu)
     {
-        renderTexture(background.texture, background.scrollingOffset, 0);
-        renderTexture(background.texture, background.scrollingOffset - background.dest.w, 0);
-        background.scroll(scroll);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        renderTexture(menu.startButton, 576, 352, 64, 128);
+    }
+
+    void renderBackground(Background &background, Ltexture &gBackground)
+    {
+        renderTexture(gBackground.texture, background.scrollingOffset, 0);
+        renderTexture(gBackground.texture, background.scrollingOffset - gBackground.w, 0);
+        background.scroll(scroll, gBackground);
     }
 
     void renderChar(Player &player)
@@ -143,7 +157,7 @@ struct Game
         player.dest.x -= scroll;
     }
 
-    void renderStage(MAP &Stage)
+    void renderStage(MAP &Stage, Ltexture &dirt)
     {
         for (int i = 0; i < MAP_HEIGHT; i++)
         {
@@ -151,9 +165,9 @@ struct Game
             {
                 if (Stage.Map[i][j] == 1)
                 {
-                    Stage.dest.x = j * ESize - (Stage.scrollingOffset % ESize);
-                    Stage.dest.y = i * ESize;
-                    SDL_RenderCopy(renderer, Stage.texture, NULL, &Stage.dest);
+                    dirt.x = j * ESize - (Stage.scrollingOffset % ESize);
+                    dirt.y = i * ESize;
+                    renderTexture(dirt.texture, dirt.x, dirt.y, dirt.h, dirt.w);
                 }
             }
         }
@@ -171,46 +185,63 @@ struct Game
             Stage.tmp = random;
             Stage.loadMap(Stage.files[random]);
             Stage.scrollingOffset = 0;
-
-            //std::cout << random << std::endl;
         }
     }
 
-    void render(Player &player, MAP &Stage, Background &background)
+    void render(Player &player, MAP &Stage, Background &background, Ltexture &dirt, Ltexture &gBackground)
     {
         SDL_RenderClear(renderer);
 
-        renderBackground(background);
+        renderBackground(background, gBackground);
         renderChar(player);
-        renderStage(Stage);
+        renderStage(Stage, dirt);
     }
 
-    /*bool gameOver()
+    void gameOver(Player &player, MAP &Stage)
     {
-        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize) return true;
-        return false;
-    }*/
+        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize)
+        {
+            start = false;
+            player.reset();
+            Stage.reset();
+            return;
+        }
+        return;
+    }
 
     bool running(Player &player)
     {
-        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize) return false;
+        SDL_GetMouseState(&x, &y);
+
         SDL_PollEvent(&event);
-        if (event.type == SDL_QUIT) return false;
+
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                return false;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (x > 576 && x < 704 && y > 352 && y < 416) start = true;
+                break;
+        }
         return true;
     }
 
-    void quit(Background &background, Player &player, MAP &Stage)
+    void quit(Player &player, Menu &menu, Ltexture &dirt, Ltexture &gBackground)
     {
         IMG_Quit();
 
         SDL_DestroyTexture(player.texture);
         player.texture = nullptr;
 
-        SDL_DestroyTexture(Stage.texture);
-        Stage.texture = nullptr;
+        SDL_DestroyTexture(dirt.texture);
+        dirt.texture = nullptr;
 
-        SDL_DestroyTexture(background.texture);
-        background.texture = nullptr;
+        SDL_DestroyTexture(gBackground.texture);
+        gBackground.texture = nullptr;
+
+        SDL_DestroyTexture(menu.startButton);
+        menu.startButton = nullptr;
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
