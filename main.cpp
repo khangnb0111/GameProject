@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     Menu menu;
 
     Game game;
-    game.init(gBackground, player, dirt, menu);
+    game.init(gBackground, gPlayer, dirt, menu);
 
     Mix_Music *gMusic = game.loadMusic("Music\\JoJo.mp3");
     game.playMusic(gMusic);
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
     background.setTexture(gBackground);
 
-    while (game.running(player))
+    while (game.running())
     {
         if (game.start)
         {
@@ -41,16 +41,24 @@ int main(int argc, char* argv[])
                 player.Jump();
                 game.play(gJump);
             }
-            if (game.currentKeyStates[SDL_SCANCODE_LEFT]) player.TurnLeft();
-            if (game.currentKeyStates[SDL_SCANCODE_RIGHT]) player.TurnRight();
+            if (game.currentKeyStates[SDL_SCANCODE_LEFT])
+            {
+                player.TurnLeft();
+                gPlayer.flip = SDL_FLIP_HORIZONTAL;
+            }
+            if (game.currentKeyStates[SDL_SCANCODE_RIGHT])
+            {
+                player.TurnRight();
+                gPlayer.flip = SDL_FLIP_NONE;
+            }
 
-            player.Move(Stage);
+            player.Move(Stage, gPlayer);
 
-            game.render(player, Stage, background, dirt, gBackground);
+            game.render(gPlayer, Stage, background, dirt, gBackground);
 
             game.present();
 
-            game.gameOver(player, Stage);
+            game.gameOver(player, Stage, gPlayer);
 
             SDL_Delay(20);
         }
@@ -65,7 +73,7 @@ int main(int argc, char* argv[])
     if (gMusic != nullptr) Mix_FreeMusic( gMusic );
     if (gJump != nullptr) Mix_FreeChunk( gJump);
 
-    game.quit(player, menu, dirt, gBackground);
+    game.quit(gPlayer, menu, dirt, gBackground);
 
     return 0;
 }

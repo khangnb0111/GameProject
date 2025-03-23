@@ -66,9 +66,9 @@ struct Game
         return texture;
     }
 
-    void initImage(Ltexture &gBackground, Player &player, Ltexture &dirt, Menu &menu)
+    void initImage(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Menu &menu)
     {
-        player.texture = loadTexture("Image/ninja.png");
+        gPlayer.texture = loadTexture("Image/ninja.png");
         dirt.texture = loadTexture("Image/dirt.jpg");
         gBackground.texture = loadTexture("Image/forest.jpg");
         menu.startButton = loadTexture("Image/startbutton.png");
@@ -114,10 +114,10 @@ struct Game
         }
     }
 
-    void init(Ltexture &gBackground, Player &player, Ltexture &dirt, Menu &menu)
+    void init(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Menu &menu)
     {
         initSDL();
-        initImage(gBackground, player, dirt, menu);
+        initImage(gBackground, gPlayer, dirt, menu);
     }
 
     void present()
@@ -151,10 +151,12 @@ struct Game
         background.scroll(scroll, gBackground);
     }
 
-    void renderChar(Player &player)
+    void renderChar(Ltexture &gPlayer)
     {
-        SDL_RenderCopyEx(renderer, player.texture, NULL, &player.dest, NULL, NULL, player.flip);
-        player.dest.x -= scroll;
+        SDL_Rect dest = {gPlayer.x, gPlayer.y, gPlayer.w, gPlayer.h};
+
+        SDL_RenderCopyEx(renderer, gPlayer.texture, NULL, &dest, NULL, NULL, gPlayer.flip);
+        gPlayer.x -= scroll;
     }
 
     void renderStage(MAP &Stage, Ltexture &dirt)
@@ -188,28 +190,28 @@ struct Game
         }
     }
 
-    void render(Player &player, MAP &Stage, Background &background, Ltexture &dirt, Ltexture &gBackground)
+    void render(Ltexture &gPlayer, MAP &Stage, Background &background, Ltexture &dirt, Ltexture &gBackground)
     {
         SDL_RenderClear(renderer);
 
         renderBackground(background, gBackground);
-        renderChar(player);
+        renderChar(gPlayer);
         renderStage(Stage, dirt);
     }
 
-    void gameOver(Player &player, MAP &Stage)
+    void gameOver(Player &player, MAP &Stage, Ltexture &gPlayer)
     {
-        if (player.dest.x <= ESize || player.dest.y >= SCREEN_HEIGHT - ESize)
+        if (gPlayer.x <= ESize || gPlayer.y >= SCREEN_HEIGHT - ESize)
         {
             start = false;
-            player.reset();
+            player.reset(gPlayer);
             Stage.reset();
             return;
         }
         return;
     }
 
-    bool running(Player &player)
+    bool running()
     {
         SDL_GetMouseState(&x, &y);
 
@@ -227,12 +229,12 @@ struct Game
         return true;
     }
 
-    void quit(Player &player, Menu &menu, Ltexture &dirt, Ltexture &gBackground)
+    void quit(Ltexture &gPlayer, Menu &menu, Ltexture &dirt, Ltexture &gBackground)
     {
         IMG_Quit();
 
-        SDL_DestroyTexture(player.texture);
-        player.texture = nullptr;
+        SDL_DestroyTexture(gPlayer.texture);
+        gPlayer.texture = nullptr;
 
         SDL_DestroyTexture(dirt.texture);
         dirt.texture = nullptr;

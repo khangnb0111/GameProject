@@ -2,45 +2,30 @@
 #define CHAR_H_INCLUDED
 
 #include "defs.h"
+#include "Ltexture.h"
 #include "Map.h"
 
 struct Player
 {
-    SDL_Texture *texture;
-
-    SDL_Rect src, dest;
-
-    SDL_RendererFlip flip;
-
     float dx= 0;
     float dy = 0;
 
     bool isOnGround = false;
 
-    Player()
+    void reset(Ltexture &gPlayer)
     {
-        dest.h = ESize;
-        dest.w = ESize;
-        dest.x = SCREEN_WIDTH / 2;
-        dest.y = SCREEN_HEIGHT / 2;
-    }
-
-    void reset()
-    {
-        dest.x = SCREEN_WIDTH / 2;
-        dest.y = SCREEN_HEIGHT / 2;
+        gPlayer.x = SCREEN_WIDTH / 2;
+        gPlayer.y = SCREEN_HEIGHT / 2;
     }
 
     void TurnLeft()
     {
         dx = -speed;
-        flip = SDL_FLIP_HORIZONTAL;
     }
 
     void TurnRight()
     {
         dx = speed;
-        flip = SDL_FLIP_NONE;
     }
 
     void Jump()
@@ -48,48 +33,49 @@ struct Player
         dy = -MaxJump;
     }
 
-    bool InStage()
+    void InScreen(Ltexture &gPlayer)
     {
-        if (dest.y <= 0) return false;
-        if (dest.x <= 0) return false;
-        if (dest.y + ESize > SCREEN_HEIGHT) return false;
-        if (dest.x + ESize > SCREEN_WIDTH) return false;
-        return true;
+        if (gPlayer.x + ESize > SCREEN_WIDTH)
+        {
+            gPlayer.x = SCREEN_WIDTH - ESize;
+            return;
+        }
+        return;
     }
 
-    void Interact(MAP &Stage)
+    void Interact(MAP &Stage, Ltexture &gPlayer)
     {
         int mx, my, adj;
         bool hit;
 
         if (dx != 0)
         {
-            dest.x += dx;
+            gPlayer.x += dx;
 
-            mx = (dx > 0 ? (dest.x + dest.w + (Stage.scrollingOffset % ESize)) : dest.x + (Stage.scrollingOffset % ESize));
+            mx = (dx > 0 ? (gPlayer.x + gPlayer.w + (Stage.scrollingOffset % ESize)) : gPlayer.x + (Stage.scrollingOffset % ESize));
             mx /= ESize;
 
-            my = dest.y / ESize;
+            my = gPlayer.y / ESize;
 
             hit = false;
 
-            if (!InStage() || Stage.Map[my][mx] != 0)
+            if (Stage.Map[my][mx] != 0)
             {
                 hit = true;
             }
 
-            my = (dest.y + dest.h - 1) / ESize;
+            my = (gPlayer.y + gPlayer.h - 1) / ESize;
 
-            if (!InStage() || Stage.Map[my][mx] != 0)
+            if (Stage.Map[my][mx] != 0)
             {
                 hit= true;
             }
 
             if (hit)
             {
-                adj = (dx > 0 ? -dest.w - (Stage.scrollingOffset % ESize) : dest.w - (Stage.scrollingOffset % ESize));
+                adj = (dx > 0 ? -gPlayer.w - (Stage.scrollingOffset % ESize) : gPlayer.w - (Stage.scrollingOffset % ESize));
 
-                dest.x = (mx * ESize) + adj;
+                gPlayer.x = (mx * ESize) + adj;
 
                 dx = 0;
             }
@@ -97,32 +83,32 @@ struct Player
 
         if (dy != 0)
         {
-            dest.y += dy;
+            gPlayer.y += dy;
 
-            my = (dy > 0 ? (dest.y + dest.h) : dest.y);
+            my = (dy > 0 ? (gPlayer.y + gPlayer.h) : gPlayer.y);
             my /= ESize;
 
-            mx = (dest.x + (Stage.scrollingOffset % ESize)) / ESize;
+            mx = (gPlayer.x + (Stage.scrollingOffset % ESize)) / ESize;
 
             hit = false;
 
-            if (!InStage() || Stage.Map[my][mx] != 0)
+            if (Stage.Map[my][mx] != 0)
             {
                 hit = true;
             }
 
-            mx = (dest.x + dest.w + (Stage.scrollingOffset % ESize) - 1) / ESize;
+            mx = (gPlayer.x + gPlayer.w + (Stage.scrollingOffset % ESize) - 1) / ESize;
 
-            if (!InStage() || Stage.Map[my][mx] != 0)
+            if (Stage.Map[my][mx] != 0)
             {
                 hit= true;
             }
 
             if (hit)
             {
-                adj = (dy > 0 ? -dest.h : dest.h);
+                adj = (dy > 0 ? -gPlayer.h : gPlayer.h);
 
-                dest.y = (my * ESize) + adj;
+                gPlayer.y = (my * ESize) + adj;
 
                 isOnGround = (dy > 0);
 
@@ -131,13 +117,14 @@ struct Player
         }
     }
 
-    void Move(MAP &Stage)
+    void Move(MAP &Stage, Ltexture &gPlayer)
     {
         dy += gravity;
 
         isOnGround = false;
 
-        Interact(Stage);
+        InScreen(gPlayer);
+        Interact(Stage, gPlayer);
 
         dx = 0;
     }

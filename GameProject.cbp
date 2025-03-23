@@ -36,6 +36,7 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="GRAPHIC.h" />
+		<Unit filename="Ltexture.h" />
 		<Unit filename="Map.h" />
 		<Unit filename="defs.h" />
 		<Unit filename="main.cpp" />

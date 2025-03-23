@@ -14,6 +14,8 @@ struct Ltexture
 
     Ltexture()
     {
+        x = SCREEN_WIDTH / 2;
+        y = SCREEN_HEIGHT / 2;
         h = ESize;
         w = ESize;
     }
