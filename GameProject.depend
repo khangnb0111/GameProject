@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1742723796 source:e:\c++\gameproject\main.cpp
+1743427370 source:e:\c++\gameproject\main.cpp
 	<iostream>
 	<SDL_mixer.h>
 	"defs.h"
@@ -8,7 +8,7 @@
 	"Map.h"
 	"Ltexture.h"
 
-1742721082 e:\c++\gameproject\defs.h
+1743427393 e:\c++\gameproject\defs.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_mixer.h>
@@ -20,22 +20,22 @@
 	<vector>
 	<ctime>
 
-1742723770 e:\c++\gameproject\graphic.h
+1743427539 e:\c++\gameproject\graphic.h
 	"defs.h"
 	"Char.h"
 	"Map.h"
 	"Ltexture.h"
 
-1742723908 e:\c++\gameproject\char.h
+1743427370 e:\c++\gameproject\char.h
 	"defs.h"
 	"Ltexture.h"
 	"Map.h"
 
-1742722277 e:\c++\gameproject\map.h
+1742745825 e:\c++\gameproject\map.h
 	"defs.h"
 	"Ltexture.h"
 	"GRAPHIC.h"
 
-1742724009 e:\c++\gameproject\ltexture.h
+1743427370 e:\c++\gameproject\ltexture.h
 	"defs.h"
 

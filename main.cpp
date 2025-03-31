@@ -12,6 +12,8 @@ using namespace std;
 Ltexture dirt;
 Ltexture gBackground;
 Ltexture gPlayer;
+Ltexture gStartButton;
+Ltexture gRestartButton;
 
 int main(int argc, char* argv[])
 {
@@ -21,16 +23,20 @@ int main(int argc, char* argv[])
 
     Background background;
 
-    Menu menu;
-
     Game game;
-    game.init(gBackground, gPlayer, dirt, menu);
+    game.init(gBackground, gPlayer, dirt, gStartButton, gRestartButton);
 
     Mix_Music *gMusic = game.loadMusic("Music\\JoJo.mp3");
     game.playMusic(gMusic);
     Mix_Chunk *gJump = game.loadSound("Music\\Jump.wav");
 
     background.setTexture(gBackground);
+
+    while (game.menu())
+    {
+        game.renderMenu(gStartButton);
+        game.present();
+    }
 
     while (game.running())
     {
@@ -54,7 +60,7 @@ int main(int argc, char* argv[])
 
             player.Move(Stage, gPlayer);
 
-            game.render(gPlayer, Stage, background, dirt, gBackground);
+            game.renderGame(gPlayer, Stage, background, dirt, gBackground);
 
             game.present();
 
@@ -65,15 +71,18 @@ int main(int argc, char* argv[])
 
         else
         {
-            game.rendermenu(menu);
+            game.renderTexture(gRestartButton.texture, 576, 352, 64, 128);
+
             game.present();
+
+            SDL_Delay(20);
         }
     }
 
     if (gMusic != nullptr) Mix_FreeMusic( gMusic );
     if (gJump != nullptr) Mix_FreeChunk( gJump);
 
-    game.quit(gPlayer, menu, dirt, gBackground);
+    game.quit(gPlayer, gStartButton, dirt, gBackground, gRestartButton);
 
     return 0;
 }

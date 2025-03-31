@@ -12,6 +12,8 @@ struct Ltexture
     float x, y;
     int h, w;
 
+    int currentFrame = 0;
+
     Ltexture()
     {
         x = SCREEN_WIDTH / 2;

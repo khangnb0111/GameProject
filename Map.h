@@ -21,7 +21,8 @@ struct MAP
     "data/Level-6.txt",
     "data/Level-7.txt",
     "data/Level-8.txt",
-    "data/Level-9.txt"};
+    "data/Level-9.txt"
+    };
 
     MAP()
     {

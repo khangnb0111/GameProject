@@ -6,11 +6,6 @@
 #include "Map.h"
 #include "Ltexture.h"
 
-struct Menu
-{
-    SDL_Texture* startButton;
-};
-
 struct Game
 {
     SDL_Window* window;
@@ -19,7 +14,8 @@ struct Game
 
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-    bool start = false;
+    bool start = true;
+    bool Continue = true;
 
     int x, y;
 
@@ -66,12 +62,13 @@ struct Game
         return texture;
     }
 
-    void initImage(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Menu &menu)
+    void initImage(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Ltexture &gStartButton, Ltexture &gRestartButton)
     {
-        gPlayer.texture = loadTexture("Image/ninja.png");
+        gPlayer.texture = loadTexture("Image/character.png");
         dirt.texture = loadTexture("Image/dirt.jpg");
         gBackground.texture = loadTexture("Image/forest.jpg");
-        menu.startButton = loadTexture("Image/startbutton.png");
+        gStartButton.texture = loadTexture("Image/startbutton.png");
+        gRestartButton.texture = loadTexture("Image/restartButton.png");
     }
 
     Mix_Music *loadMusic(const char* path)
@@ -114,10 +111,10 @@ struct Game
         }
     }
 
-    void init(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Menu &menu)
+    void init(Ltexture &gBackground, Ltexture &gPlayer, Ltexture &dirt, Ltexture &gStartButton, Ltexture &gRestartButton)
     {
         initSDL();
-        initImage(gBackground, gPlayer, dirt, menu);
+        initImage(gBackground, gPlayer, dirt, gStartButton, gRestartButton);
     }
 
     void present()
@@ -137,11 +134,18 @@ struct Game
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void rendermenu(Menu &menu)
+    void renderMenu(Ltexture &gStartButton)
     {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
-        renderTexture(menu.startButton, 576, 352, 64, 128);
+        renderTexture(gStartButton.texture, 576, 352, 64, 128);
+    }
+
+    void renderRestart(Ltexture &gRestartButton)
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+        renderTexture(gRestartButton.texture, 576, 352, 64, 128);
     }
 
     void renderBackground(Background &background, Ltexture &gBackground)
@@ -154,8 +158,9 @@ struct Game
     void renderChar(Ltexture &gPlayer)
     {
         SDL_Rect dest = {gPlayer.x, gPlayer.y, gPlayer.w, gPlayer.h};
+        SDL_Rect *src = &sPlayer[gPlayer.currentFrame];
 
-        SDL_RenderCopyEx(renderer, gPlayer.texture, NULL, &dest, NULL, NULL, gPlayer.flip);
+        SDL_RenderCopyEx(renderer, gPlayer.texture, src, &dest, NULL, NULL, gPlayer.flip);
         gPlayer.x -= scroll;
     }
 
@@ -190,7 +195,7 @@ struct Game
         }
     }
 
-    void render(Ltexture &gPlayer, MAP &Stage, Background &background, Ltexture &dirt, Ltexture &gBackground)
+    void renderGame(Ltexture &gPlayer, MAP &Stage, Background &background, Ltexture &dirt, Ltexture &gBackground)
     {
         SDL_RenderClear(renderer);
 
@@ -211,6 +216,16 @@ struct Game
         return;
     }
 
+    bool menu()
+    {
+        SDL_GetMouseState(&x, &y);
+
+        SDL_PollEvent(&event);
+
+        if (event.type == SDL_MOUSEBUTTONDOWN && x > 576 && x < 704 && y > 352 && y < 416) return false;
+        return true;
+    }
+
     bool running()
     {
         SDL_GetMouseState(&x, &y);
@@ -223,16 +238,15 @@ struct Game
                 return false;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (x > 576 && x < 704 && y > 352 && y < 416) start = true;
+                if (!start && x > 576 && x < 704 && y > 352 && y < 416) start = true;
                 break;
         }
+
         return true;
     }
 
-    void quit(Ltexture &gPlayer, Menu &menu, Ltexture &dirt, Ltexture &gBackground)
+    void quit(Ltexture &gPlayer, Ltexture &gStartButton, Ltexture &dirt, Ltexture &gBackground, Ltexture &gRestartButton)
     {
-        IMG_Quit();
-
         SDL_DestroyTexture(gPlayer.texture);
         gPlayer.texture = nullptr;
 
@@ -242,11 +256,16 @@ struct Game
         SDL_DestroyTexture(gBackground.texture);
         gBackground.texture = nullptr;
 
-        SDL_DestroyTexture(menu.startButton);
-        menu.startButton = nullptr;
+        SDL_DestroyTexture(gStartButton.texture);
+        gStartButton.texture = nullptr;
+
+        SDL_DestroyTexture(gRestartButton.texture);
+        gRestartButton.texture = nullptr;
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
+        IMG_Quit();
+        Mix_Quit();
         SDL_Quit();
     }
 };
