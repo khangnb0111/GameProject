@@ -12,7 +12,7 @@ struct Player
 
     bool isOnGround = false;
 
-    void reset(Ltexture &gPlayer)
+    void reset(LTexture &gPlayer)
     {
         gPlayer.x = SCREEN_WIDTH / 2;
         gPlayer.y = SCREEN_HEIGHT / 2;
@@ -33,7 +33,7 @@ struct Player
         dy = -MaxJump;
     }
 
-    void InScreen(Ltexture &gPlayer)
+    void InScreen(LTexture &gPlayer)
     {
         if (gPlayer.x + ESize > SCREEN_WIDTH)
         {
@@ -43,7 +43,7 @@ struct Player
         return;
     }
 
-    void Interact(MAP &Stage, Ltexture &gPlayer)
+    void Interact(MAP &Stage, LTexture &gPlayer)
     {
         int mx, my, adj;
         bool hit;
@@ -117,7 +117,7 @@ struct Player
         }
     }
 
-    void Move(MAP &Stage, Ltexture &gPlayer)
+    void Move(MAP &Stage, LTexture &gPlayer)
     {
         dy += gravity;
 
@@ -125,6 +125,9 @@ struct Player
 
         InScreen(gPlayer);
         Interact(Stage, gPlayer);
+
+        if (dy < 0) gPlayer.currentFrame = 5;
+        if (dy > 0) gPlayer.currentFrame = 6;
 
         dx = 0;
     }

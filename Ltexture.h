@@ -1,11 +1,11 @@
-#ifndef LTEXTURE_H_INCLUDED
-#define LTEXTURE_H_INCLUDED
+#ifndef LTexture_H_INCLUDED
+#define LTexture_H_INCLUDED
 
 #include "defs.h"
 
-struct Ltexture
+struct LTexture
 {
-    SDL_Texture* texture;
+    SDL_Texture* texture = nullptr;
 
     SDL_RendererFlip flip;
 
@@ -14,13 +14,35 @@ struct Ltexture
 
     int currentFrame = 0;
 
-    Ltexture()
+    LTexture()
     {
         x = SCREEN_WIDTH / 2;
         y = SCREEN_HEIGHT / 2;
         h = ESize;
         w = ESize;
     }
+
+    ~LTexture()
+    {
+        if (texture != nullptr)
+        {
+            SDL_DestroyTexture(texture);
+            texture = nullptr;
+        }
+    }
+
+    SDL_Texture* loadTexture(const char *filename, SDL_Renderer* renderer)
+    {
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,"Loading %s", filename);
+
+        SDL_Texture* newTexture = IMG_LoadTexture(renderer, filename);
+        if (newTexture == NULL) {
+            SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,"Load texture %s", IMG_GetError());
+        }
+
+        texture = newTexture;
+        return texture;
+    }
 };
 
-#endif // LTEXTURE_H_INCLUDED
+#endif // LTexture_H_INCLUDED

@@ -32,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="BUTTON.h" />
 		<Unit filename="Char.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

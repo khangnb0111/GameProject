@@ -12,17 +12,16 @@ struct MAP
     int tmp;
 
     std::string files[10] = {
-    "data/Level-0.txt",
-    "data/Level-1.txt",
-    "data/Level-2.txt",
-    "data/Level-3.txt",
-    "data/Level-4.txt",
-    "data/Level-5.txt",
-    "data/Level-6.txt",
-    "data/Level-7.txt",
-    "data/Level-8.txt",
-    "data/Level-9.txt"
-    };
+                "data/Level-0.txt",
+                "data/Level-1.txt",
+                "data/Level-2.txt",
+                "data/Level-3.txt",
+                "data/Level-4.txt",
+                "data/Level-5.txt",
+                "data/Level-6.txt",
+                "data/Level-7.txt",
+                "data/Level-8.txt",
+                "data/Level-9.txt"};
 
     MAP()
     {
@@ -115,13 +114,13 @@ struct Background
 {
     int scrollingOffset = 0;
 
-    void setTexture(Ltexture &gBackground)
+    void setTexture(LTexture &gBackground)
     {
         gBackground.w = SCREEN_WIDTH;
         gBackground.h = SCREEN_WIDTH;
     }
 
-    void scroll(int distance, Ltexture &gBackground)
+    void scroll(const int distance, LTexture &gBackground)
     {
         scrollingOffset -= distance;
         if( scrollingOffset < 0 ) { scrollingOffset = gBackground.w; }
