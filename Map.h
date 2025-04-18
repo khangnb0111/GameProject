@@ -3,7 +3,6 @@
 
 #include "defs.h"
 #include "Ltexture.h"
-#include "GRAPHIC.h"
 
 struct MAP
 {
@@ -98,7 +97,7 @@ struct MAP
         file.close();
     }
 
-    void MapMove()
+    void MapScroll()
     {
         for (int i = 0; i < MAP_HEIGHT; i++)
         {

@@ -18,10 +18,16 @@ struct Button
     {
         button.x = x;
         button.y = y;
+        button.h = COMMON_BUTTON_HEIGHT;
+        button.w = COMMON_BUTTON_WIDTH;
     }
 
-    bool IsInside(const int X, const int Y, LTexture &button, int Size)
+    bool IsInside(const LTexture &button, const int Size)
     {
+        int X, Y;
+
+        SDL_GetMouseState(&X, &Y);
+
 		int button_width, button_height;
 		if (Size == SMALL_BUTTON)
 		{

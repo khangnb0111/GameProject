@@ -31,7 +31,7 @@ struct LTexture
         }
     }
 
-    SDL_Texture* loadTexture(const char *filename, SDL_Renderer* renderer)
+    void loadTexture(const char *filename, SDL_Renderer* renderer)
     {
         SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,"Loading %s", filename);
 
@@ -41,7 +41,6 @@ struct LTexture
         }
 
         texture = newTexture;
-        return texture;
     }
 };
 

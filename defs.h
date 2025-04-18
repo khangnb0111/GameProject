@@ -34,18 +34,21 @@ const int COMMON_BUTTON_HEIGHT = 98;
 const int SMALL_BUTTON_WIDTH = 22;
 const int SMALL_BUTTON_HEIGHT = 34;
 
-const int PLAY_BUTON_POSX = 389;
-const int PLAY_BUTTON_POSY= 186;
-const int HELP_BUTTON_POSX = 389;
-const int HELP_BUTTON_POSY = 293;
-const int EXIT_BUTTON_POSX = 389;
-const int EXIT_BUTTON_POSY = 402;
+const int PLAY_BUTON_POSX = 350;
+const int PLAY_BUTTON_POSY= 350;
+const int EXIT_BUTTON_POSX = 350;
+const int EXIT_BUTTON_POSY = 459;
 const int BACK_BUTTON_POSX = 31;
 const int BACK_BUTTON_POSY = 29;
 const int PAUSE_BUTTON_POSX = 31;
 const int PAUSE_BUTTON_POSY = 29;
 const int CONTINUE_BUTTON_POSX = 31;
 const int CONTINUE_BUTTON_POSY = 29;
+
+const int HIGH_SCORE_POSX = 200;
+const int HIGH_SCORE_POSY = 150;
+const int HIGH_SCORE_HEIGHT = 180;
+const int HIGH_SCORE_WIDTH = 250;
 
 SDL_Rect sPlayer[] = {
         {6, 0, 18, 24},
@@ -61,5 +64,7 @@ SDL_Rect sPlayer[] = {
 SDL_Rect sButton[] = {
         {0, 0, 150, 98},
         {150, 0, 150, 98}};
+
+const int sExplosion = 10;
 
 #endif // DEFS_H_INCLUDED

@@ -5,11 +5,12 @@
 #include "Char.h"
 #include "Map.h"
 #include "LTexture.h"
+#include "BUTTON.h"
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Event event;
-SDL_Color textColor = { 0, 0, 0 };
+SDL_Color textColor = { 255, 255, 255 };
 TTF_Font* gFont = nullptr;
 Mix_Music* gMusic = nullptr;
 Mix_Music* gMenuMusic = nullptr;
@@ -51,7 +52,40 @@ void initSDL()
     {
         logErrorAndExit( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
     }
+
+    if (TTF_Init() == -1)
+    {
+        logErrorAndExit("SDL_ttf could not initialize! SDL_ttf Error: ",
+                         TTF_GetError());
+    }
 }
+
+TTF_Font* loadFont(const char* path, int size)
+{
+    TTF_Font* gFont = TTF_OpenFont( path, size );
+    if (gFont == nullptr) {
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Load font %s", TTF_GetError());
+    }
+    return gFont;
+}
+
+SDL_Texture* renderText(const char* text, TTF_Font* font, SDL_Color textColor)
+{
+    SDL_Surface* textSurface = TTF_RenderText_Solid( font, text, textColor );
+    if( textSurface == nullptr ) {
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Render text surface %s", TTF_GetError());
+        return nullptr;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface( renderer, textSurface );
+    if( texture == nullptr ) {
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Create texture from text %s", SDL_GetError());
+    }
+
+    SDL_FreeSurface( textSurface );
+    return texture;
+}
+
 
 Mix_Music *loadMusic(const char* path)
 {
@@ -151,7 +185,7 @@ void renderMap(MAP &Stage, LTexture &dirt)
 
     Stage.scrollingOffset += scroll;
 
-    if (Stage.scrollingOffset % ESize == 0) Stage.MapMove();
+    if (Stage.scrollingOffset % ESize == 0) Stage.MapScroll();
     if (Stage.scrollingOffset >= SCREEN_WIDTH + ESize)
     {
         int random = rand() % 10;
@@ -165,13 +199,26 @@ void renderMap(MAP &Stage, LTexture &dirt)
     }
 }
 
-void renderGame(LTexture &gPlayer, MAP &Stage, Background &background, LTexture &dirt, LTexture &gBackground)
+void HandlePlayButton(Button &button, LTexture &texture)
 {
-    SDL_RenderClear(renderer);
+    texture.currentFrame = 0;
+    if (button.IsInside(texture, 2))
+    {
+        texture.currentFrame = 1;
+        if (event.type == SDL_MOUSEBUTTONDOWN) Menu = false;
+    }
+}
 
-    renderBackground(background, gBackground);
-    renderChar(gPlayer);
-    renderMap(Stage, dirt);
+bool HandleExitButton(Button &button, LTexture &texture)
+{
+    texture.currentFrame = 0;
+    if (button.IsInside(texture, 2))
+    {
+        texture.currentFrame = 1;
+        if (event.type == SDL_MOUSEBUTTONDOWN) return true;
+    }
+
+    return false;
 }
 
 void gameOver(Player &player, MAP &Stage, LTexture &gPlayer)
@@ -203,9 +250,6 @@ bool running()
         case SDL_QUIT:
             return false;
             break;
-        case SDL_MOUSEBUTTONDOWN:
-            if (Menu && x > 576 && x < 704 && y > 352 && y < 416) Menu = false;
-            break;
     }
 
     return true;
@@ -217,6 +261,7 @@ void quit()
     SDL_DestroyWindow(window);
     IMG_Quit();
     Mix_Quit();
+    TTF_Quit();
     SDL_Quit();
 }
 

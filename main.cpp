@@ -14,15 +14,14 @@ LTexture dirt;
 LTexture gBackground;
 LTexture gPlayer;
 LTexture gPlayButtonTexture;
-LTexture gHelpButtonTexture;
 LTexture gExitButtonTexture;
 LTexture gBackButtonTexture;
 LTexture gPauseButtonTexture;
 LTexture gContinueButtonTexture;
 LTexture gMenu;
+LTexture gExplosion[10];
 
 Button PlayButton(PLAY_BUTON_POSX, PLAY_BUTTON_POSY);
-Button HelpButton(HELP_BUTTON_POSX, HELP_BUTTON_POSY);
 Button ExitButton(EXIT_BUTTON_POSX, EXIT_BUTTON_POSY);
 Button BackButton(BACK_BUTTON_POSX, BACK_BUTTON_POSY);
 Button PauseButton(PAUSE_BUTTON_POSX, PAUSE_BUTTON_POSY);
@@ -39,11 +38,16 @@ int main(int argc, char* argv[])
 
     initSDL();
 
+    gFont = loadFont("data/pixel_font.ttf", 100);
+
+    SDL_Texture* HighScoreText = renderText("High Score: ", gFont, textColor);
+
+    gJump = loadSound("Music\\Jump.wav");
+
     gPlayer.loadTexture("Image/character.png", renderer);
     dirt.loadTexture("Image/dirt.jpg", renderer);
     gBackground.loadTexture("Image/forest.jpg", renderer);
     gPlayButtonTexture.loadTexture("Image/play_button.png", renderer);
-    gHelpButtonTexture.loadTexture("Image/help_button.png", renderer);
     gExitButtonTexture.loadTexture("Image/exit_button.png", renderer);
     gBackButtonTexture.loadTexture("Image/back_button.png", renderer);
     gPauseButtonTexture.loadTexture("Image/pause_button.png", renderer);
@@ -51,15 +55,10 @@ int main(int argc, char* argv[])
     gMenu.loadTexture("Image/dogge.jpg", renderer);
 
     PlayButton.GetButton(gPlayButtonTexture);
-    HelpButton.GetButton(gHelpButtonTexture);
     ExitButton.GetButton(gExitButtonTexture);
     BackButton.GetButton(gBackButtonTexture);
     PauseButton.GetButton(gPauseButtonTexture);
     ContinueButton.GetButton(gContinueButtonTexture);
-
-    //Mix_Music *gMusic = loadMusic("Music\\JoJo.mp3");
-    //playMusic(gMusic);
-    //Mix_Chunk *gJump = loadSound("Music\\Jump.wav");
 
     background.setTexture(gBackground);
 
@@ -71,7 +70,7 @@ int main(int argc, char* argv[])
             if (currentKeyStates[SDL_SCANCODE_UP] && player.isOnGround)
             {
                 player.Jump();
-                //play(gJump);
+                play(gJump);
                 keyDown = true;
             }
             if (currentKeyStates[SDL_SCANCODE_LEFT])
@@ -96,7 +95,11 @@ int main(int argc, char* argv[])
 
             player.Move(Stage, gPlayer);
 
-            renderGame(gPlayer, Stage, background, dirt, gBackground);
+            SDL_RenderClear(renderer);
+
+            renderBackground(background, gBackground);
+            renderChar(gPlayer);
+            renderMap(Stage, dirt);
 
             present();
 
@@ -106,16 +109,25 @@ int main(int argc, char* argv[])
         }
         else
         {
+            HandlePlayButton(PlayButton, gPlayButtonTexture);
+            if (HandleExitButton(ExitButton, gExitButtonTexture)) break;
+
             SDL_RenderCopy(renderer, gMenu.texture, NULL, NULL);
+            renderTexture(HighScoreText, HIGH_SCORE_POSX, HIGH_SCORE_POSY, HIGH_SCORE_HEIGHT, HIGH_SCORE_WIDTH);
             renderButton(gPlayButtonTexture);
-            renderButton(gHelpButtonTexture);
             renderButton(gExitButtonTexture);
             present();
+
+            SDL_Delay(30);
         }
     }
 
     if (gMusic != nullptr) Mix_FreeMusic( gMusic );
     if (gJump != nullptr) Mix_FreeChunk( gJump);
+
+    SDL_DestroyTexture( HighScoreText );
+    TTF_CloseFont( gFont );
+    HighScoreText = NULL;
 
     quit();
 
