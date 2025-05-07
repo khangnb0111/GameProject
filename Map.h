@@ -7,7 +7,8 @@
 struct MAP
 {
     int Map[MAP_HEIGHT][(MAP_WIDTH + 1) * 2] = {0};
-    int scrollingOffset = 0;
+    float scrollingOffset = 0;
+    int cnt = 0;
     int tmp;
 
     std::string files[10] = {
@@ -111,7 +112,7 @@ struct MAP
 
 struct Background
 {
-    int scrollingOffset = 0;
+    float scrollingOffset = 0;
 
     void setTexture(LTexture &gBackground)
     {
@@ -119,7 +120,7 @@ struct Background
         gBackground.h = SCREEN_WIDTH;
     }
 
-    void scroll(const int distance, LTexture &gBackground)
+    void scroll(const float distance, LTexture &gBackground)
     {
         scrollingOffset -= distance;
         if( scrollingOffset < 0 ) { scrollingOffset = gBackground.w; }

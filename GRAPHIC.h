@@ -69,24 +69,6 @@ TTF_Font* loadFont(const char* path, int size)
     return gFont;
 }
 
-SDL_Texture* renderText(const char* text, TTF_Font* font, SDL_Color textColor)
-{
-    SDL_Surface* textSurface = TTF_RenderText_Solid( font, text, textColor );
-    if( textSurface == nullptr ) {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Render text surface %s", TTF_GetError());
-        return nullptr;
-    }
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface( renderer, textSurface );
-    if( texture == nullptr ) {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "Create texture from text %s", SDL_GetError());
-    }
-
-    SDL_FreeSurface( textSurface );
-    return texture;
-}
-
-
 Mix_Music *loadMusic(const char* path)
 {
     Mix_Music *gMusic = Mix_LoadMUS(path);
@@ -144,6 +126,45 @@ void renderTexture(SDL_Texture *texture, int x, int y, int h = SCREEN_HEIGHT, in
     SDL_RenderCopy(renderer, texture, NULL, &dest);
 }
 
+void GetHighScore(std::string &HighScore)
+{
+    std::ifstream file("data/High_Score.txt");
+
+    if (!file)
+    {
+        std::cout << "Error opening file: data/High_Score.txt" << std::endl;
+        return;
+    }
+
+    file >> HighScore;
+
+    file.close();
+
+    return;
+}
+
+void UpdateHighScore(const int Score)
+{
+    int OldHighScore = 0;
+
+    std::ifstream inFile("data/High_Score.txt");
+    if (inFile.is_open())
+    {
+        inFile >> OldHighScore;
+        inFile.close();
+    }
+
+    if (Score > OldHighScore)
+    {
+        std::ofstream outFile("data/High_Score.txt", std::ios::trunc);
+        if (outFile.is_open())
+        {
+            outFile << Score;
+            outFile.close();
+        }
+    }
+}
+
 void renderButton(const LTexture &button)
 {
     SDL_Rect dest = {button.x, button.y, button.w, button.h};
@@ -159,6 +180,14 @@ void renderBackground(Background &background, LTexture &gBackground)
     background.scroll(scroll, gBackground);
 }
 
+void renderExplosion(LTexture &texture)
+{
+    for (int i = 0 ; i < MAP_HEIGHT ; i++)
+    {
+        renderTexture(texture.texture, -32, i * ESize - 32, ESize * 2, ESize * 3);
+    }
+}
+
 void renderChar(LTexture &gPlayer)
 {
     SDL_Rect dest = {gPlayer.x, gPlayer.y, gPlayer.w, gPlayer.h};
@@ -168,7 +197,7 @@ void renderChar(LTexture &gPlayer)
     gPlayer.x -= scroll;
 }
 
-void renderMap(MAP &Stage, LTexture &dirt)
+void renderMap(MAP &Stage, LTexture &gBrick)
 {
     for (int i = 0; i < MAP_HEIGHT; i++)
     {
@@ -176,17 +205,23 @@ void renderMap(MAP &Stage, LTexture &dirt)
         {
             if (Stage.Map[i][j] == 1)
             {
-                dirt.x = j * ESize - (Stage.scrollingOffset % ESize);
-                dirt.y = i * ESize;
-                renderTexture(dirt.texture, dirt.x, dirt.y, dirt.h, dirt.w);
+                gBrick.x = int(j * ESize - Stage.scrollingOffset);
+                gBrick.y = int(i * ESize);
+                renderTexture(gBrick.texture, gBrick.x, gBrick.y, gBrick.h, gBrick.w);
             }
         }
     }
 
     Stage.scrollingOffset += scroll;
 
-    if (Stage.scrollingOffset % ESize == 0) Stage.MapScroll();
-    if (Stage.scrollingOffset >= SCREEN_WIDTH + ESize)
+    while (Stage.scrollingOffset >= ESize)
+    {
+        Stage.cnt++;
+        Stage.MapScroll();
+        Stage.scrollingOffset -= ESize;
+    }
+
+    if (Stage.cnt >= MAP_WIDTH + 1)
     {
         int random = rand() % 10;
         while (random == Stage.tmp)
@@ -195,7 +230,7 @@ void renderMap(MAP &Stage, LTexture &dirt)
         }
         Stage.tmp = random;
         Stage.loadMap(Stage.files[random]);
-        Stage.scrollingOffset = 0;
+        Stage.cnt -= MAP_WIDTH + 1;
     }
 }
 
@@ -223,11 +258,7 @@ bool HandleExitButton(Button &button, LTexture &texture)
 
 void gameOver(Player &player, MAP &Stage, LTexture &gPlayer)
 {
-    int x, y;
-
-    SDL_GetMouseState(&x, &y);
-
-    if (gPlayer.x <= ESize || gPlayer.y >= SCREEN_HEIGHT - ESize)
+    if (gPlayer.x <= ESize * 2 || gPlayer.y >= SCREEN_HEIGHT - ESize)
     {
         Menu = true;
         player.reset(gPlayer);

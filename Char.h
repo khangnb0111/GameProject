@@ -9,6 +9,7 @@ struct Player
 {
     float dx= 0;
     float dy = 0;
+    int frames = 0;
 
     bool isOnGround = false;
 
@@ -52,7 +53,7 @@ struct Player
         {
             gPlayer.x += dx;
 
-            mx = (dx > 0 ? (gPlayer.x + gPlayer.w + (Stage.scrollingOffset % ESize)) : gPlayer.x + (Stage.scrollingOffset % ESize));
+            mx = (dx > 0 ? (gPlayer.x + gPlayer.w + Stage.scrollingOffset) : gPlayer.x + Stage.scrollingOffset);
             mx /= ESize;
 
             my = gPlayer.y / ESize;
@@ -73,7 +74,7 @@ struct Player
 
             if (hit)
             {
-                adj = (dx > 0 ? -gPlayer.w - (Stage.scrollingOffset % ESize) : gPlayer.w - (Stage.scrollingOffset % ESize));
+                adj = (dx > 0 ? -gPlayer.w - Stage.scrollingOffset : gPlayer.w - Stage.scrollingOffset);
 
                 gPlayer.x = (mx * ESize) + adj;
 
@@ -88,7 +89,7 @@ struct Player
             my = (dy > 0 ? (gPlayer.y + gPlayer.h) : gPlayer.y);
             my /= ESize;
 
-            mx = (gPlayer.x + (Stage.scrollingOffset % ESize)) / ESize;
+            mx = (gPlayer.x + Stage.scrollingOffset) / ESize;
 
             hit = false;
 
@@ -97,7 +98,7 @@ struct Player
                 hit = true;
             }
 
-            mx = (gPlayer.x + gPlayer.w + (Stage.scrollingOffset % ESize) - 1) / ESize;
+            mx = (gPlayer.x + gPlayer.w + Stage.scrollingOffset - 1) / ESize;
 
             if (Stage.Map[my][mx] != 0)
             {
@@ -126,8 +127,7 @@ struct Player
         InScreen(gPlayer);
         Interact(Stage, gPlayer);
 
-        if (dy < 0) gPlayer.currentFrame = 5;
-        if (dy > 0) gPlayer.currentFrame = 6;
+        if (dy != 0) gPlayer.currentFrame = 4;
 
         dx = 0;
     }
