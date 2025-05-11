@@ -20,7 +20,7 @@ const int SCREEN_HEIGHT = 768;
 
 const int ESize = 64;
 
-const int FPS = 25;
+const int FPS = 30;
 
 const int MAP_HEIGHT = 12;
 const int MAP_WIDTH = 20;

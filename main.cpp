@@ -1,5 +1,4 @@
 #include <iostream>
-#include <SDL_mixer.h>
 
 #include "defs.h"
 #include "GRAPHIC.h"
@@ -11,6 +10,7 @@
 using namespace std;
 
 LTexture gBrick;
+LTexture gSpike;
 LTexture gBackground;
 LTexture gPlayer;
 LTexture gPlayButtonTexture;
@@ -37,10 +37,6 @@ MAP Stage;
 
 Background background;
 
-int Score = 0;
-
-string HighScore;
-
 int main(int argc, char* argv[])
 {
 
@@ -52,6 +48,7 @@ int main(int argc, char* argv[])
 
     gPlayer.loadTexture("Image/mario.png", renderer);
     gBrick.loadTexture("Image/brick.png", renderer);
+    gSpike.loadTexture("Image/spike.png", renderer);
     gBackground.loadTexture("Image/black.jpg", renderer);
     gPlayButtonTexture.loadTexture("Image/play_button.png", renderer);
     gExitButtonTexture.loadTexture("Image/exit_button.png", renderer);
@@ -86,8 +83,8 @@ int main(int argc, char* argv[])
         int gettick = SDL_GetTicks();
         if (scroll < 20)
         {
-            scroll += 0.001;
-            speed += 0.001;
+            scroll += 0.005;
+            speed += 0.005;
         }
         if (!Menu)
         {
@@ -135,8 +132,6 @@ int main(int argc, char* argv[])
 
             player.Move(Stage, gPlayer);
 
-
-
             SDL_RenderClear(renderer);
 
             Score++;
@@ -144,7 +139,7 @@ int main(int argc, char* argv[])
 
             renderBackground(background, gBackground);
             renderChar(gPlayer);
-            renderMap(Stage, gBrick);
+            renderMap(Stage, gBrick, gSpike);
             renderExplosion(gExplosion[Score % 10]);
             renderTexture(gScoreText.texture, SCORE_TEXT_POSX, SCORE_TEXT_POSY, SCORE_TEXT_HEIGHT, SCORE_TEXT_WIDTH);
             renderTexture(gScore.texture, SCORE_POSX, SCORE_POSY, SCORE_HEIGHT, SCORE_WIDTH);
@@ -155,7 +150,10 @@ int main(int argc, char* argv[])
         }
         else
         {
+            player.reset(gPlayer);
+            Stage.reset();
             scroll = 4;
+            speed = 6;
             UpdateHighScore(Score);
             Score = 0;
             GetHighScore(HighScore);

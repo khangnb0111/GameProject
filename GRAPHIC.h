@@ -23,6 +23,9 @@ const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 bool Menu = true;
 bool Continue = true;
 
+int Score = 0;
+std::string HighScore;
+
 void logErrorAndExit(const char* msg, const char* error)
 {
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s: %s", msg, error);
@@ -197,7 +200,7 @@ void renderChar(LTexture &gPlayer)
     gPlayer.x -= scroll;
 }
 
-void renderMap(MAP &Stage, LTexture &gBrick)
+void renderMap(MAP &Stage, LTexture &gBrick, LTexture &gSpike)
 {
     for (int i = 0; i < MAP_HEIGHT; i++)
     {
@@ -208,6 +211,12 @@ void renderMap(MAP &Stage, LTexture &gBrick)
                 gBrick.x = int(j * ESize - Stage.scrollingOffset);
                 gBrick.y = int(i * ESize);
                 renderTexture(gBrick.texture, gBrick.x, gBrick.y, gBrick.h, gBrick.w);
+            }
+            if (Stage.Map[i][j] == 2)
+            {
+                gSpike.x = int(j * ESize - Stage.scrollingOffset);
+                gSpike.y = int(i * ESize);
+                renderTexture(gSpike.texture, gSpike.x, gSpike.y, gSpike.h, gSpike.w);
             }
         }
     }
@@ -261,8 +270,6 @@ void gameOver(Player &player, MAP &Stage, LTexture &gPlayer)
     if (gPlayer.x <= ESize * 2 || gPlayer.y >= SCREEN_HEIGHT - ESize)
     {
         Menu = true;
-        player.reset(gPlayer);
-        Stage.reset();
         return;
     }
     return;
