@@ -31,26 +31,26 @@ const float gravity = 1.5;
 const int MaxJump = 25;
 const int PLAYERFRAMES = 3;
 
-const int COMMON_BUTTON_WIDTH = 150;
-const int COMMON_BUTTON_HEIGHT = 98;
-const int SMALL_BUTTON_WIDTH = 22;
-const int SMALL_BUTTON_HEIGHT = 34;
+const int COMMON_BUTTON_WIDTH = 170;
+const int COMMON_BUTTON_HEIGHT = 120;
+const int SMALL_BUTTON_WIDTH = 50;
+const int SMALL_BUTTON_HEIGHT = 50;
 
 const int PLAY_BUTON_POSX = 350;
 const int PLAY_BUTTON_POSY= 350;
+const int SETTING_BUTTON_POSX = 350;
+const int SETTING_BUTTON_POSY = 480;
 const int EXIT_BUTTON_POSX = 350;
-const int EXIT_BUTTON_POSY = 459;
-const int BACK_BUTTON_POSX = 31;
-const int BACK_BUTTON_POSY = 29;
-const int PAUSE_BUTTON_POSX = 31;
-const int PAUSE_BUTTON_POSY = 29;
-const int CONTINUE_BUTTON_POSX = 31;
-const int CONTINUE_BUTTON_POSY = 29;
+const int EXIT_BUTTON_POSY = 610;
+const int BACK_BUTTON_POSX = 565;
+const int BACK_BUTTON_POSY = 460;
+const int CONTINUE_BUTTON_POSX = 565;
+const int CONTINUE_BUTTON_POSY = 330;
 
-const int HIGH_SCORE_TEXT_POSX = 200;
+const int HIGH_SCORE_TEXT_POSX = 150;
 const int HIGH_SCORE_TEXT_POSY = 150;
 const int HIGH_SCORE_TEXT_HEIGHT = 180;
-const int HIGH_SCORE_TEXT_WIDTH = 250;
+const int HIGH_SCORE_TEXT_WIDTH = 300;
 const int HIGH_SCORE_POSX = 480;
 const int HIGH_SCORE_POSY = 150;
 const int HIGH_SCORE_HEIGHT = 180;
@@ -65,6 +65,20 @@ const int SCORE_POSY = 70;
 const int SCORE_HEIGHT = 90;
 const int SCORE_WIDTH = 90;
 
+const int MUSIC_TEXT_POSX = 485;
+const int MUSIC_TEXT_POSY= 330;
+const int MUSIC_TEXT_HEIGHT = 120;
+const int MUSIC_TEXT_WIDTH = 170;
+const int MUSIC_BUTTON_POSX = 690;
+const int MUSIC_BUTTON_POSY= 370;
+
+const int SOUND_TEXT_POSX = 485;
+const int SOUND_TEXT_POSY= 200;
+const int SOUND_TEXT_HEIGHT = 120;
+const int SOUND_TEXT_WIDTH = 170;
+const int SOUND_BUTTON_POSX = 690;
+const int SOUND_BUTTON_POSY= 240;
+
 SDL_Rect sPlayer[] = {
         {5, 0, 16, 16},
         {35, 0, 16, 16},
@@ -72,10 +86,6 @@ SDL_Rect sPlayer[] = {
         {95, 0, 16, 16},
         {155, 0, 16, 16},
         {184, 14, 16, 16}};
-
-SDL_Rect sButton[] = {
-        {0, 0, 150, 98},
-        {150, 0, 150, 98}};
 
 const int sExplosion = 10;
 

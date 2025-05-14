@@ -7,16 +7,26 @@
 
 struct Player
 {
-    float dx= 0;
-    float dy = 0;
-    int frames = 0;
+    float dx, dy;
+    int frames;
 
-    bool isOnGround = false;
+    bool die;
+    bool isOnGround;
+
+    Player()
+    {
+        dx = 0;
+        dy = 0;
+        frames = 0;
+        die = false;
+        isOnGround = false;
+    }
 
     void reset(LTexture &gPlayer)
     {
         gPlayer.x = SCREEN_WIDTH / 2;
         gPlayer.y = SCREEN_HEIGHT / 2;
+        die = false;
     }
 
     void TurnLeft()
@@ -62,14 +72,16 @@ struct Player
 
             if (Stage.Map[my][mx] != 0)
             {
-                hit = true;
+                if (Stage.Map[my][mx] == 2) die = true;
+                else hit = true;
             }
 
             my = (gPlayer.y + gPlayer.h - 1) / ESize;
 
             if (Stage.Map[my][mx] != 0)
             {
-                hit= true;
+                if (Stage.Map[my][mx] == 2) die = true;
+                else hit = true;
             }
 
             if (hit)
@@ -95,14 +107,16 @@ struct Player
 
             if (Stage.Map[my][mx] != 0)
             {
-                hit = true;
+                if (Stage.Map[my][mx] == 2) die = true;
+                else hit = true;
             }
 
             mx = (gPlayer.x + gPlayer.w + Stage.scrollingOffset - 1) / ESize;
 
             if (Stage.Map[my][mx] != 0)
             {
-                hit= true;
+                if (Stage.Map[my][mx] == 2) die = true;
+                else hit = true;
             }
 
             if (hit)

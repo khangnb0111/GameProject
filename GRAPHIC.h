@@ -6,22 +6,24 @@
 #include "Map.h"
 #include "LTexture.h"
 #include "BUTTON.h"
+#include "TIME.h"
 
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Event event;
-SDL_Color textColor = { 255, 255, 255 };
+SDL_Color textColor[2] = {{255, 255, 255},
+                          {135, 206, 235}};
 TTF_Font* gFont = nullptr;
 Mix_Music* gMusic = nullptr;
-Mix_Music* gMenuMusic = nullptr;
-Mix_Chunk* gClick = nullptr;
 Mix_Chunk* gJump = nullptr;
-Mix_Chunk* gLose = nullptr;
+Mix_Chunk* gGameOver = nullptr;
+
+Time fps_time;
 
 const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
 bool Menu = true;
-bool Continue = true;
+bool Setting = false;
 
 int Score = 0;
 std::string HighScore;
@@ -133,12 +135,6 @@ void GetHighScore(std::string &HighScore)
 {
     std::ifstream file("data/High_Score.txt");
 
-    if (!file)
-    {
-        std::cout << "Error opening file: data/High_Score.txt" << std::endl;
-        return;
-    }
-
     file >> HighScore;
 
     file.close();
@@ -146,34 +142,25 @@ void GetHighScore(std::string &HighScore)
     return;
 }
 
-void UpdateHighScore(const int Score)
+void UpdateHighScore(int score)
 {
-    int OldHighScore = 0;
-
+    int oldScore = 0;
     std::ifstream inFile("data/High_Score.txt");
-    if (inFile.is_open())
-    {
-        inFile >> OldHighScore;
-        inFile.close();
-    }
+    if (inFile) inFile >> oldScore;
+    inFile.close();
 
-    if (Score > OldHighScore)
-    {
+    if (score > oldScore) {
         std::ofstream outFile("data/High_Score.txt", std::ios::trunc);
-        if (outFile.is_open())
-        {
-            outFile << Score;
-            outFile.close();
-        }
+        if (outFile) outFile << score;
+        outFile.close();
     }
 }
 
 void renderButton(const LTexture &button)
 {
     SDL_Rect dest = {button.x, button.y, button.w, button.h};
-    SDL_Rect* src = &sButton[button.currentFrame];
 
-    SDL_RenderCopy(renderer, button.texture, src, &dest);
+    SDL_RenderCopy(renderer, button.texture, NULL, &dest);
 }
 
 void renderBackground(Background &background, LTexture &gBackground)
@@ -200,79 +187,147 @@ void renderChar(LTexture &gPlayer)
     gPlayer.x -= scroll;
 }
 
-void renderMap(MAP &Stage, LTexture &gBrick, LTexture &gSpike)
-{
+void renderMap(MAP& Stage, LTexture& gBrick, LTexture& gSpike) {
     for (int i = 0; i < MAP_HEIGHT; i++)
     {
-        for (int j = 0; j < MAP_WIDTH + 1; j++)
+        for (int j = Stage.scrollingOffset / ESize; j <= MAP_WIDTH + Stage.scrollingOffset / ESize; j++)
         {
-            if (Stage.Map[i][j] == 1)
-            {
-                gBrick.x = int(j * ESize - Stage.scrollingOffset);
-                gBrick.y = int(i * ESize);
-                renderTexture(gBrick.texture, gBrick.x, gBrick.y, gBrick.h, gBrick.w);
-            }
-            if (Stage.Map[i][j] == 2)
-            {
-                gSpike.x = int(j * ESize - Stage.scrollingOffset);
-                gSpike.y = int(i * ESize);
-                renderTexture(gSpike.texture, gSpike.x, gSpike.y, gSpike.h, gSpike.w);
-            }
+            int tile = Stage.Map[i][j];
+            int x = j * ESize - Stage.scrollingOffset;
+            int y = i * ESize;
+            if (tile == 1) renderTexture(gBrick.texture, x, y, gBrick.h, gBrick.w);
+            else if (tile == 2) renderTexture(gSpike.texture, x, y, gSpike.h, gSpike.w);
         }
     }
 
     Stage.scrollingOffset += scroll;
+    while (Stage.scrollingOffset >= ESize * Stage.cnt) Stage.cnt++;
 
-    while (Stage.scrollingOffset >= ESize)
-    {
-        Stage.cnt++;
-        Stage.MapScroll();
-        Stage.scrollingOffset -= ESize;
-    }
-
-    if (Stage.cnt >= MAP_WIDTH + 1)
-    {
-        int random = rand() % 10;
-        while (random == Stage.tmp)
-        {
-            random = rand() % 10;
-        }
+    if (Stage.cnt >= MAP_WIDTH + 1) {
+        int random;
+        do { random = rand() % 10; } while (random == Stage.tmp);
         Stage.tmp = random;
         Stage.loadMap(Stage.files[random]);
+        Stage.scrollingOffset -= Stage.cnt * ESize;
         Stage.cnt -= MAP_WIDTH + 1;
+    }
+}
+
+void DrawThickRect(SDL_Renderer* renderer, SDL_Rect rect, int thickness, const int Fill)
+{
+    for (int i = 0; i < thickness; i++)
+    {
+        SDL_Rect temp = { rect.x - i, rect.y - i, rect.w + 2*i, rect.h + 2*i };
+        if (i == thickness - 1)
+        {
+            if (Fill == 1) SDL_RenderFillRect(renderer, &temp);
+            else SDL_RenderDrawRect(renderer, &temp);
+        }
+        else SDL_RenderDrawRect(renderer, &temp);
+    }
+}
+
+void HandleMusicButton(Button &button, LTexture &texture)
+{
+    if (button.IsInside(texture, 2))
+    {
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            button.currentFrame = (button.currentFrame + 1) % 2;
+            if (button.currentFrame == 1)
+            {
+                Mix_VolumeMusic(0);
+            }
+            else
+            {
+                Mix_VolumeMusic(128);
+            }
+        }
+    }
+}
+
+void HandleSoundButton(Button &button, LTexture &texture)
+{
+    if (button.IsInside(texture, 2))
+    {
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            button.currentFrame = (button.currentFrame + 1) % 2;
+            if (button.currentFrame == 1)
+            {
+                Mix_VolumeChunk(gJump, 0);
+            }
+            else
+            {
+                Mix_VolumeChunk(gJump, 128);
+            }
+        }
     }
 }
 
 void HandlePlayButton(Button &button, LTexture &texture)
 {
-    texture.currentFrame = 0;
+    button.currentFrame = 0;
     if (button.IsInside(texture, 2))
     {
-        texture.currentFrame = 1;
+        button.currentFrame = 1;
         if (event.type == SDL_MOUSEBUTTONDOWN) Menu = false;
+    }
+}
+
+void HandleContinueButton(Button &button, LTexture &texture)
+{
+    button.currentFrame = 0;
+    if (button.IsInside(texture, 2))
+    {
+        button.currentFrame = 1;
+        if (event.type == SDL_MOUSEBUTTONDOWN) fps_time.UnPause();
+    }
+}
+
+void HandleBackButton(Button &button, LTexture &texture)
+{
+    button.currentFrame = 0;
+    if (button.IsInside(texture, 2))
+    {
+        button.currentFrame = 1;
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            Menu = true;
+            Setting = false;
+            fps_time.UnPause();
+        }
+    }
+}
+
+void HandleSettingButton(Button &button, LTexture &texture)
+{
+    button.currentFrame = 0;
+    if (button.IsInside(texture, 2))
+    {
+        button.currentFrame = 1;
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            Setting = true;
+        }
     }
 }
 
 bool HandleExitButton(Button &button, LTexture &texture)
 {
-    texture.currentFrame = 0;
+    button.currentFrame = 0;
     if (button.IsInside(texture, 2))
     {
-        texture.currentFrame = 1;
+        button.currentFrame = 1;
         if (event.type == SDL_MOUSEBUTTONDOWN) return true;
     }
 
     return false;
 }
 
-void gameOver(Player &player, MAP &Stage, LTexture &gPlayer)
+void gameOver()
 {
-    if (gPlayer.x <= ESize * 2 || gPlayer.y >= SCREEN_HEIGHT - ESize)
-    {
-        Menu = true;
-        return;
-    }
-    return;
+    Menu = true;
 }
 
 bool running()

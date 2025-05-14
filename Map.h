@@ -27,7 +27,7 @@ struct MAP
     {
         for (int i = 0; i < MAP_HEIGHT; i++)
         {
-            for (int j = 0; j <= MAP_WIDTH; j++)
+            for (int j = 0; j < (MAP_WIDTH + 1) * 2; j++)
             {
                 if (i == 0 || i == MAP_HEIGHT - 1)
                 {
@@ -40,7 +40,7 @@ struct MAP
             }
         }
 
-        Map[MAP_HEIGHT - 1][MAP_WIDTH] = 0;
+        Map[MAP_HEIGHT - 1][MAP_WIDTH * 2 + 1] = 0;
 
         tmp = rand() % 10;
 
@@ -53,7 +53,7 @@ struct MAP
 
         for (int i = 0; i < MAP_HEIGHT; i++)
         {
-            for (int j = 0; j <= MAP_WIDTH; j++)
+            for (int j = 0; j <= (MAP_WIDTH + 1) * 2; j++)
             {
                 if (i == 0 || i == MAP_HEIGHT - 1)
                 {
@@ -66,7 +66,7 @@ struct MAP
             }
         }
 
-        Map[MAP_HEIGHT - 1][MAP_WIDTH] = 0;
+        Map[MAP_HEIGHT - 1][MAP_WIDTH * 2 + 1] = 0;
 
         tmp = rand() % 10;
 
@@ -75,6 +75,14 @@ struct MAP
 
     void loadMap(const std::string &fileName)
     {
+        for (int i = 0; i < MAP_HEIGHT; i++)
+        {
+            for (int j = 0; j <= MAP_WIDTH; j++)
+            {
+                Map[i][j] = Map[i][j + MAP_WIDTH + 1];
+            }
+        }
+
         std::ifstream file(fileName);
 
         if (!file)
@@ -96,17 +104,6 @@ struct MAP
         }
 
         file.close();
-    }
-
-    void MapScroll()
-    {
-        for (int i = 0; i < MAP_HEIGHT; i++)
-        {
-            for (int j = 0; j < 2 * (MAP_WIDTH + 1) - 1; j++)
-            {
-                Map[i][j] = Map[i][j + 1];
-            }
-        }
     }
 };
 

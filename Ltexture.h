@@ -31,11 +31,11 @@ struct LTexture
         }
     }
 
-    void loadTexture(const char *filename, SDL_Renderer* renderer)
+    void loadTexture(std::string filename, SDL_Renderer* renderer)
     {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,"Loading %s", filename);
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,"Loading %s", filename.c_str());
 
-        SDL_Texture* newTexture = IMG_LoadTexture(renderer, filename);
+        SDL_Texture* newTexture = IMG_LoadTexture(renderer, filename.c_str());
         if (newTexture == NULL) {
             SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,"Load texture %s", IMG_GetError());
         }
