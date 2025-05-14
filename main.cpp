@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
     for (int i = 0; i < 2; i++)
     {
         gContinueButtonTexture[i].loadText("Continue", gFont, textColor[i], renderer);
-        gPlayButtonTexture[i].loadText("Play", gFont, textColor[i], renderer);
-        gExitButtonTexture[i].loadText("Exit", gFont, textColor[i], renderer);
-        gBackButtonTexture[i].loadText("Back", gFont, textColor[i], renderer);
+        gPlayButtonTexture[i].loadText(" Play ", gFont, textColor[i], renderer);
+        gExitButtonTexture[i].loadText(" Exit ", gFont, textColor[i], renderer);
+        gBackButtonTexture[i].loadText(" Back ", gFont, textColor[i], renderer);
         gSettingButtonTexture[i].loadText("Setting", gFont, textColor[i], renderer);
     }
 
@@ -172,8 +172,6 @@ int main(int argc, char* argv[])
                 if (gPlayer.x <= ESize * 2 || gPlayer.y >= SCREEN_HEIGHT - ESize || player.die)
                 {
                     gameOver();
-                    player.dy = 0;
-                    Mix_HaltMusic();
                     play(gGameOver);
                 }
 
@@ -210,6 +208,8 @@ int main(int argc, char* argv[])
 
             else
             {
+                player.dy = 0;
+                Mix_HaltMusic();
                 player.reset(gPlayer);
                 Stage.reset();
                 scroll = 4;
@@ -248,6 +248,7 @@ int main(int argc, char* argv[])
 
     if (gMusic != nullptr) Mix_FreeMusic( gMusic );
     if (gJump != nullptr) Mix_FreeChunk( gJump);
+    if (gGameOver != nullptr) Mix_FreeChunk(gGameOver);
 
     TTF_CloseFont( gFont );
 

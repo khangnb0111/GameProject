@@ -256,10 +256,12 @@ void HandleSoundButton(Button &button, LTexture &texture)
             if (button.currentFrame == 1)
             {
                 Mix_VolumeChunk(gJump, 0);
+                Mix_VolumeChunk(gGameOver, 0);
             }
             else
             {
                 Mix_VolumeChunk(gJump, 128);
+                Mix_VolumeChunk(gGameOver, 128);
             }
         }
     }

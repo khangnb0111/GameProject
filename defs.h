@@ -24,27 +24,27 @@ const int FPS = 30;
 
 const int MAP_HEIGHT = 12;
 const int MAP_WIDTH = 20;
-float scroll = 4;
+float scroll = 6;
 
-float speed = 6;
+float speed = 8;
 const float gravity = 1.5;
 const int MaxJump = 25;
 const int PLAYERFRAMES = 3;
 
-const int COMMON_BUTTON_WIDTH = 170;
+const int COMMON_BUTTON_WIDTH = 270;
 const int COMMON_BUTTON_HEIGHT = 120;
 const int SMALL_BUTTON_WIDTH = 50;
 const int SMALL_BUTTON_HEIGHT = 50;
 
-const int PLAY_BUTON_POSX = 350;
+const int PLAY_BUTON_POSX = 280;
 const int PLAY_BUTTON_POSY= 350;
-const int SETTING_BUTTON_POSX = 350;
+const int SETTING_BUTTON_POSX = 280;
 const int SETTING_BUTTON_POSY = 480;
-const int EXIT_BUTTON_POSX = 350;
+const int EXIT_BUTTON_POSX = 280;
 const int EXIT_BUTTON_POSY = 610;
-const int BACK_BUTTON_POSX = 565;
+const int BACK_BUTTON_POSX = 500;
 const int BACK_BUTTON_POSY = 460;
-const int CONTINUE_BUTTON_POSX = 565;
+const int CONTINUE_BUTTON_POSX = 500;
 const int CONTINUE_BUTTON_POSY = 330;
 
 const int HIGH_SCORE_TEXT_POSX = 150;
