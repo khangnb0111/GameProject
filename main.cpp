@@ -11,7 +11,6 @@
 using namespace std;
 
 LTexture gBrick;
-LTexture gSpike;
 LTexture gBackground;
 LTexture gPlayer;
 LTexture gPlayButtonTexture[2];
@@ -23,6 +22,7 @@ LTexture gMusicButton;
 LTexture gSoundButton;
 LTexture gMenu;
 LTexture gExplosion[10];
+LTexture gFire[6];
 LTexture gHighScoreText;
 LTexture gHighScore;
 LTexture gScore;
@@ -55,14 +55,19 @@ int main(int argc, char* argv[])
 
     gPlayer.loadTexture("Image/mario.png", renderer);
     gBrick.loadTexture("Image/brick.png", renderer);
-    gSpike.loadTexture("Image/spike.png", renderer);
     gBackground.loadTexture("Image/black.jpg", renderer);
     gMenu.loadTexture("Image/dogge.jpg", renderer);
 
-    for (int i = 1; i <= 10; ++i)
+    for (int i = 1; i <= 10; i++)
     {
         std::string path = "Image/Circle_explosion/Circle_explosion" + std::to_string(i) + ".png";
         gExplosion[i].loadTexture(path, renderer);
+    }
+
+    for (int i = 1; i <= 6; i++)
+    {
+        std::string path = "Image/Fire/Fire" + std::to_string(i) + ".png";
+        gFire[i].loadTexture(path, renderer);
     }
 
     gHighScoreText.loadText("High Score: ", gFont, textColor[0], renderer);
@@ -164,7 +169,7 @@ int main(int argc, char* argv[])
 
                 renderBackground(background, gBackground);
                 renderChar(gPlayer);
-                renderMap(Stage, gBrick, gSpike);
+                renderMap(Stage, gBrick, gFire[Score % 6]);
                 renderExplosion(gExplosion[Score % 10]);
                 renderTexture(gScoreText.texture, SCORE_TEXT_POSX, SCORE_TEXT_POSY, SCORE_TEXT_HEIGHT, SCORE_TEXT_WIDTH);
                 renderTexture(gScore.texture, SCORE_POSX, SCORE_POSY, SCORE_HEIGHT, SCORE_WIDTH);

@@ -187,7 +187,7 @@ void renderChar(LTexture &gPlayer)
     gPlayer.x -= scroll;
 }
 
-void renderMap(MAP& Stage, LTexture& gBrick, LTexture& gSpike) {
+void renderMap(MAP& Stage, LTexture& gBrick, LTexture& gFire) {
     for (int i = 0; i < MAP_HEIGHT; i++)
     {
         for (int j = Stage.scrollingOffset / ESize; j <= MAP_WIDTH + Stage.scrollingOffset / ESize; j++)
@@ -196,7 +196,7 @@ void renderMap(MAP& Stage, LTexture& gBrick, LTexture& gSpike) {
             int x = j * ESize - Stage.scrollingOffset;
             int y = i * ESize;
             if (tile == 1) renderTexture(gBrick.texture, x, y, gBrick.h, gBrick.w);
-            else if (tile == 2) renderTexture(gSpike.texture, x, y, gSpike.h, gSpike.w);
+            else if (tile == 2) renderTexture(gFire.texture, x, y, ESize, ESize);
         }
     }
 
